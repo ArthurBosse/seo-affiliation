@@ -3,13 +3,20 @@
 // ============================================================
 // BoutonCTA — Bouton d'appel à l'action affiliation
 // Redirige vers /go/[slug] (tracking interne obligatoire)
+//
+// Le prop `position` identifie l'emplacement du CTA dans la page.
+// Il est transmis au handler /go/[slug] via ?pos= pour construire
+// le paramètre utm_content, et déclenche un event GA4 côté client.
 // ============================================================
+
+import { trackEvent } from "@/components/Analytics";
 
 interface BoutonCTAProps {
   slug: string; // Slug de redirection interne /go/[slug]
   texte: string; // Texte du bouton
   partenaire?: string; // Affiché sous le bouton (ex: "Via Amazon")
   prix?: string; // Prix affiché dans le bouton
+  position?: "hero" | "tableau" | "verdict" | "faq" | "liens"; // Position dans la page
   variante?: "principal" | "secondaire" | "discret";
   taille?: "sm" | "md" | "lg";
   className?: string;
@@ -35,11 +42,20 @@ export default function BoutonCTA({
   texte,
   partenaire,
   prix,
+  position,
   variante = "principal",
   taille = "md",
   className = "",
 }: BoutonCTAProps) {
-  const href = `/go/${slug}`;
+  const href = position ? `/go/${slug}?pos=${position}` : `/go/${slug}`;
+
+  function handleClick() {
+    trackEvent("affiliation_click", {
+      produit: slug,
+      position: position ?? "inconnu",
+      partenaire: partenaire ?? "",
+    });
+  }
 
   return (
     <div className={`flex flex-col items-center gap-1 ${className}`}>
@@ -47,6 +63,7 @@ export default function BoutonCTA({
         href={href}
         rel="nofollow noopener sponsored"
         target="_blank"
+        onClick={handleClick}
         className={`
           inline-flex items-center justify-center gap-2 rounded-lg
           transition-all duration-200 transform hover:-translate-y-0.5

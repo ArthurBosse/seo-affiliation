@@ -177,6 +177,7 @@ export default async function PageAvis({
                 texte={lienPrincipal.ctaTexte}
                 partenaire={lienPrincipal.partenaire}
                 prix={lienPrincipal.prix}
+                position="hero"
                 variante="principal"
                 taille="lg"
               />
@@ -242,6 +243,7 @@ export default async function PageAvis({
               texte={`Commander ${avis.nomProduit}`}
               partenaire={lienPrincipal.partenaire}
               prix={lienPrincipal.prix}
+              position="verdict"
               variante="principal"
               taille="lg"
             />
@@ -270,6 +272,7 @@ export default async function PageAvis({
                   texte={lien.ctaTexte}
                   partenaire={lien.partenaire}
                   prix={lien.prix}
+                  position="liens"
                   variante="secondaire"
                 />
               ))}
