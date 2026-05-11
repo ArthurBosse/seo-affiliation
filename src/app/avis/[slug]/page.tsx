@@ -20,6 +20,7 @@ import ProsCons from "@/components/ui/ProsCons";
 import VerdictBox from "@/components/ui/VerdictBox";
 import ScoreGlobal from "@/components/ui/ScoreGlobal";
 import BadgeCategorie from "@/components/ui/BadgeCategorie";
+import CTABanniereSticky from "@/components/CTABanniereSticky";
 import {
   buildReviewSchema,
   buildArticleSchema,
@@ -223,7 +224,21 @@ export default async function PageAvis({
           liens, nous percevons une commission sans coût supplémentaire pour
           vous. Nos avis restent indépendants et objectifs.
         </div>
+
+        {/* Espaceur mobile pour éviter le chevauchement avec le sticky CTA */}
+        {lienPrincipal && <div className="h-16 sm:hidden" aria-hidden="true" />}
       </main>
+
+      {/* ── CTA sticky mobile ─────────────────────────────────── */}
+      {lienPrincipal && (
+        <CTABanniereSticky
+          slug={lienPrincipal.slug}
+          texte={lienPrincipal.ctaTexte}
+          nomProduit={avis.nomProduit}
+          partenaire={lienPrincipal.partenaire}
+          prix={lienPrincipal.prix}
+        />
+      )}
     </>
   );
 }
