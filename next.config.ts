@@ -1,8 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Génération statique pour les pages d'avis (SSG)
-  output: "standalone",
+  // Note : pas d'output "standalone" — Vercel gère son propre pipeline de build.
+  // "standalone" est réservé aux déploiements Docker self-hosted.
 
   // Optimisation des images WebP/AVIF
   images: {

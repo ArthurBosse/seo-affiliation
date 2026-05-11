@@ -1,0 +1,21 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "installCommand": "npm ci",
+  "outputDirectory": ".next",
+  "regions": ["cdg1"],
+  "headers": [
+    {
+      "source": "/go/(.*)",
+      "headers": [
+        { "key": "X-Robots-Tag", "value": "noindex, nofollow" },
+        { "key": "Cache-Control", "value": "no-store, no-cache" }
+      ]
+    }
+  ],
+  "rewrites": [],
+  "env": {
+    "NEXT_PUBLIC_SITE_URL": "https://seo-affiliation.vercel.app"
+  }
+}
