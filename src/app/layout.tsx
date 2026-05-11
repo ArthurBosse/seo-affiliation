@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Analytics, { GTMBodyTag } from "@/components/Analytics";
+import BanniereConsentement from "@/components/BanniereConsentement";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -54,9 +56,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr">
+      <head>
+        <Analytics />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white text-gray-900 min-h-screen flex flex-col`}
       >
+        {/* GTM noscript fallback */}
+        <GTMBodyTag />
         {/* ── Header ── */}
         <header className="border-b border-gray-200 bg-white sticky top-0 z-50 shadow-sm">
           <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
@@ -79,6 +86,9 @@ export default function RootLayout({
 
         {/* ── Contenu principal ── */}
         <div className="flex-1">{children}</div>
+
+        {/* ── Bannière cookies RGPD ── */}
+        <BanniereConsentement />
 
         {/* ── Footer ── */}
         <footer className="bg-gray-900 text-gray-400 mt-16">
