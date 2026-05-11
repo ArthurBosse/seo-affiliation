@@ -1,17 +1,45 @@
 @import "tailwindcss";
 
-/* Variables globales */
+/* ============================================================
+   Design Tokens CSS — CAS-17
+   Source unique de vérité pour les variables visuelles.
+   Adapter ici une fois CAS-16 livré (couleurs, typo, radius).
+   ============================================================ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Couleurs sémantiques */
+  --color-bg:         #ffffff;
+  --color-fg:         #111827;
+  --color-brand:      #16a34a;
+  --color-brand-light:#dcfce7;
+  --color-brand-dark: #15803d;
+  --color-cta:        #ea580c;
+  --color-cta-hover:  #c2410c;
+  --color-muted:      #f9fafb;
+  --color-border:     #e5e7eb;
+
+  /* Typographie */
+  --font-sans: var(--font-geist-sans), system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), monospace;
+
+  /* Espacements & radius */
+  --radius-card: 0.75rem;
+  --radius-btn:  0.5rem;
+
+  /* Ombres */
+  --shadow-card:      0 1px 3px 0 rgb(0 0 0 / .07);
+  --shadow-card-hover:0 4px 12px 0 rgb(0 0 0 / .10);
 }
 
+/* ── Base ────────────────────────────────────────────────── */
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--color-bg);
+  color: var(--color-fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Amélioration de la lisibilité du prose pour les pages d'avis */
+/* ── Prose (contenu éditorial riche) ─────────────────────── */
 .prose h2 {
   @apply text-2xl font-bold text-gray-900 mt-8 mb-4;
 }
@@ -30,4 +58,28 @@ body {
 
 .prose strong {
   @apply font-semibold text-gray-900;
+}
+
+/* ── Composants utilitaires ─────────────────────────────── */
+
+/* Carte cliquable générique */
+.card-hover {
+  @apply transition-all duration-200;
+  box-shadow: var(--shadow-card);
+}
+.card-hover:hover {
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-1px);
+}
+
+/* Bouton principal brand */
+.btn-brand {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg font-bold
+         bg-brand-600 hover:bg-brand-700 text-white
+         px-6 py-3 transition-all duration-200;
+  box-shadow: 0 4px 14px 0 rgb(22 163 74 / .30);
+}
+.btn-brand:hover {
+  box-shadow: 0 6px 20px 0 rgb(22 163 74 / .40);
+  transform: translateY(-1px);
 }

@@ -1,24 +1,24 @@
 // ============================================================
 // Page d'accueil — /
-// Liste les avis disponibles par catégorie
+// CAS-17 : utilise les composants du design system
 // ============================================================
 
 import { getAllAvis } from "@/lib/content";
-import NoteEtoiles from "@/components/NoteEtoiles";
+import CardAvis from "@/components/ui/CardAvis";
 
 export default async function PageAccueil() {
   const avis = await getAllAvis();
   const SITE_NOM = process.env.NEXT_PUBLIC_SITE_NOM ?? "MonSiteAvis";
 
   return (
-    <main className="max-w-4xl mx-auto px-4 py-10">
+    <main className="max-w-5xl mx-auto px-4 py-10">
       {/* ── Hero ────────────────────────────────────────────── */}
       <div className="text-center mb-12">
-        <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4">
+        <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 leading-tight">
           Avis indépendants sur les compléments{" "}
-          <span className="text-green-600">santé & bien-être</span>
+          <span className="text-brand-600">santé &amp; bien-être</span>
         </h1>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+        <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
           Nous testons pour vous les compléments alimentaires les plus populaires.
           Nos avis sont basés sur des tests réels, pas sur la publicité.
         </p>
@@ -29,54 +29,32 @@ export default async function PageAccueil() {
         <h2 id="section-avis" className="text-2xl font-bold text-gray-900 mb-6">
           Derniers avis
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          {avis.map((a) => (
-            <a
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          {avis.map((a, index) => (
+            <CardAvis
               key={a.slug}
-              href={`/avis/${a.slug}`}
-              className="group block rounded-xl border border-gray-200 p-5 hover:border-green-500
-                         hover:shadow-md transition-all duration-200 bg-white"
-            >
-              <div className="flex items-start justify-between gap-3 mb-3">
-                <h3 className="font-bold text-gray-900 group-hover:text-green-700 leading-snug">
-                  {a.titre}
-                </h3>
-                <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full whitespace-nowrap flex-shrink-0">
-                  {a.categorie}
-                </span>
-              </div>
-              <NoteEtoiles
-                note={a.noteCertifiee}
-                taille="sm"
-                afficherChiffre
-                nombreAvis={a.nombreAvis}
-                className="mb-3"
-              />
-              <p className="text-sm text-gray-600 line-clamp-2">
-                {a.metaDescription}
-              </p>
-              <p className="text-sm text-green-700 font-medium mt-3 group-hover:underline">
-                Lire l&apos;avis complet →
-              </p>
-            </a>
+              slug={a.slug}
+              titre={a.titre}
+              categorie={a.categorie}
+              noteCertifiee={a.noteCertifiee}
+              nombreAvis={a.nombreAvis}
+              metaDescription={a.metaDescription}
+              meilleurChoix={index === 0}
+            />
           ))}
         </div>
       </section>
 
-      {/* ── Lien comparatifs ─────────────────────────────────── */}
-      <section className="mt-12 bg-green-50 border border-green-200 rounded-2xl p-8 text-center">
+      {/* ── CTA comparatifs ──────────────────────────────────── */}
+      <section className="mt-14 bg-brand-50 border border-brand-200 rounded-3xl p-8 text-center">
         <h2 className="text-2xl font-bold text-gray-900 mb-3">
           Besoin de comparer plusieurs produits ?
         </h2>
-        <p className="text-gray-600 mb-5">
+        <p className="text-gray-600 mb-5 max-w-lg mx-auto">
           Nos comparatifs mettent côte à côte les meilleurs produits de chaque
           catégorie pour vous aider à choisir.
         </p>
-        <a
-          href="/comparatif"
-          className="inline-block bg-green-600 hover:bg-green-700 text-white font-bold
-                     px-6 py-3 rounded-lg transition-colors duration-200"
-        >
+        <a href="/comparatif" className="btn-brand">
           Voir les comparatifs
         </a>
       </section>

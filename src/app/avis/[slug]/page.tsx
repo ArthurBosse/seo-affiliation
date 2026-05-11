@@ -1,8 +1,10 @@
 // ============================================================
 // Template page avis produit — /avis/[slug]
+// CAS-17 : composants design system (ProsCons, VerdictBox,
+//           ScoreGlobal, Breadcrumb)
 //
-// Structure SEO optimisée :
-//   H1 → Note globale → Résumé pros/cons → Verdict → CTA
+// Structure SEO intacte (CAS-4, CAS-7) :
+//   H1 → ScoreGlobal → Résumé pros/cons → VerdictBox → CTA
 //   → Contenu détaillé → CTA ancrage → FAQ schema.org
 //
 // Rendu : SSG (generateStaticParams) avec ISR (revalidate 86400)
@@ -11,9 +13,13 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import type { Metadata } from "next";
-import NoteEtoiles from "@/components/NoteEtoiles";
 import BoutonCTA from "@/components/BoutonCTA";
 import FAQSchema from "@/components/FAQSchema";
+import Breadcrumb from "@/components/ui/Breadcrumb";
+import ProsCons from "@/components/ui/ProsCons";
+import VerdictBox from "@/components/ui/VerdictBox";
+import ScoreGlobal from "@/components/ui/ScoreGlobal";
+import BadgeCategorie from "@/components/ui/BadgeCategorie";
 import {
   buildReviewSchema,
   buildArticleSchema,
@@ -29,7 +35,6 @@ export async function generateStaticParams() {
   return slugs.map((slug) => ({ slug }));
 }
 
-// Revalidation toutes les 24h (ISR)
 export const revalidate = 86400;
 
 // ── Métadonnées dynamiques (SEO) ─────────────────────────────
@@ -80,12 +85,11 @@ export default async function PageAvis({
     { nom: avis.titre, url: `/avis/${avis.slug}` },
   ];
 
-  // Lien affiliation principal (premier de la liste)
   const lienPrincipal = avis.liens[0];
 
   return (
     <>
-      {/* ── JSON-LD Schema.org ─────────────────────────────── */}
+      {/* ── JSON-LD Schema.org (SEO — CAS-4, CAS-7) ──────── */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: jsonLd(buildReviewSchema(avis)) }}
@@ -107,20 +111,7 @@ export default async function PageAvis({
 
       <main className="max-w-3xl mx-auto px-4 py-8">
         {/* ── Breadcrumb ──────────────────────────────────── */}
-        <nav aria-label="Fil d'Ariane" className="text-sm text-gray-500 mb-6">
-          {breadcrumbs.map((item, i) => (
-            <span key={item.url}>
-              {i > 0 && <span className="mx-2">›</span>}
-              {i < breadcrumbs.length - 1 ? (
-                <a href={item.url} className="hover:text-green-700 underline">
-                  {item.nom}
-                </a>
-              ) : (
-                <span className="text-gray-700">{item.nom}</span>
-              )}
-            </span>
-          ))}
-        </nav>
+        <Breadcrumb items={breadcrumbs} className="mb-6" />
 
         {/* ── H1 ──────────────────────────────────────────── */}
         <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 leading-tight mb-4">
@@ -128,9 +119,9 @@ export default async function PageAvis({
         </h1>
 
         {/* ── Méta auteur / date ───────────────────────────── */}
-        <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500 mb-6">
+        <div className="flex flex-wrap items-center gap-2 text-sm text-gray-500 mb-6">
           <span>Par {avis.auteur}</span>
-          <span>·</span>
+          <span aria-hidden="true">·</span>
           <time dateTime={avis.dateMiseAJour}>
             Mis à jour le{" "}
             {new Date(avis.dateMiseAJour).toLocaleDateString("fr-FR", {
@@ -139,14 +130,12 @@ export default async function PageAvis({
               year: "numeric",
             })}
           </time>
-          <span>·</span>
-          <span className="bg-green-100 text-green-800 px-2 py-0.5 rounded-full text-xs font-medium">
-            {avis.categorie}
-          </span>
+          <span aria-hidden="true">·</span>
+          <BadgeCategorie categorie={avis.categorie} />
         </div>
 
         {/* ── Image principale ─────────────────────────────── */}
-        <div className="relative w-full aspect-video rounded-xl overflow-hidden mb-6 bg-gray-100">
+        <div className="relative w-full aspect-video rounded-2xl overflow-hidden mb-6 bg-gray-100">
           <Image
             src={avis.imagePrincipale}
             alt={avis.imageAlt}
@@ -157,33 +146,12 @@ export default async function PageAvis({
           />
         </div>
 
-        {/* ── Note globale ─────────────────────────────────── */}
-        <div className="bg-green-50 border border-green-200 rounded-xl p-5 mb-6">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <p className="text-sm font-medium text-green-800 uppercase tracking-wide mb-1">
-                Notre note globale
-              </p>
-              <NoteEtoiles
-                note={avis.noteCertifiee}
-                taille="lg"
-                afficherChiffre
-                nombreAvis={avis.nombreAvis}
-              />
-            </div>
-            {lienPrincipal && (
-              <BoutonCTA
-                slug={lienPrincipal.slug}
-                texte={lienPrincipal.ctaTexte}
-                partenaire={lienPrincipal.partenaire}
-                prix={lienPrincipal.prix}
-                position="hero"
-                variante="principal"
-                taille="lg"
-              />
-            )}
-          </div>
-        </div>
+        {/* ── Note globale + CTA hero ───────────────────────── */}
+        <ScoreGlobal
+          note={avis.noteCertifiee}
+          nombreAvis={avis.nombreAvis}
+          lienPrincipal={lienPrincipal}
+        />
 
         {/* ── Introduction ─────────────────────────────────── */}
         <div
@@ -192,48 +160,13 @@ export default async function PageAvis({
         />
 
         {/* ── Tableau Pros / Cons ──────────────────────────── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 my-8">
-          {/* Avantages */}
-          <div className="bg-green-50 border border-green-200 rounded-xl p-5">
-            <h2 className="text-lg font-bold text-green-800 mb-3 flex items-center gap-2">
-              <span className="text-2xl">✅</span> Avantages
-            </h2>
-            <ul className="space-y-2">
-              {avis.prosCons.avantages.map((item, i) => (
-                <li key={i} className="flex items-start gap-2 text-green-900">
-                  <span className="text-green-600 mt-0.5 flex-shrink-0">✓</span>
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+        <ProsCons
+          avantages={avis.prosCons.avantages}
+          inconvenients={avis.prosCons.inconvenients}
+        />
 
-          {/* Inconvénients */}
-          <div className="bg-red-50 border border-red-200 rounded-xl p-5">
-            <h2 className="text-lg font-bold text-red-800 mb-3 flex items-center gap-2">
-              <span className="text-2xl">❌</span> Inconvénients
-            </h2>
-            <ul className="space-y-2">
-              {avis.prosCons.inconvenients.map((item, i) => (
-                <li key={i} className="flex items-start gap-2 text-red-900">
-                  <span className="text-red-500 mt-0.5 flex-shrink-0">✗</span>
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-
-        {/* ── Verdict rapide ───────────────────────────────── */}
-        <div className="bg-yellow-50 border-l-4 border-yellow-400 rounded-r-xl p-5 my-8">
-          <h2 className="text-xl font-bold text-gray-900 mb-2 flex items-center gap-2">
-            <span>⚡</span> Notre verdict
-          </h2>
-          <div
-            className="prose prose-gray max-w-none"
-            dangerouslySetInnerHTML={{ __html: avis.verdict }}
-          />
-        </div>
+        {/* ── Verdict ──────────────────────────────────────── */}
+        <VerdictBox html={avis.verdict} />
 
         {/* ── CTA ancrage (après verdict) ──────────────────── */}
         {lienPrincipal && (
@@ -260,7 +193,7 @@ export default async function PageAvis({
 
         {/* ── Liens affiliation alternatifs ────────────────── */}
         {avis.liens.length > 1 && (
-          <div className="my-8 p-5 bg-gray-50 border border-gray-200 rounded-xl">
+          <div className="my-8 p-5 bg-surface-muted border border-gray-200 rounded-2xl">
             <h2 className="text-lg font-bold text-gray-900 mb-4">
               Où acheter {avis.nomProduit} ?
             </h2>
@@ -284,11 +217,11 @@ export default async function PageAvis({
         <FAQSchema faqs={avis.faq} />
 
         {/* ── Disclaimer affiliation ───────────────────────── */}
-        <div className="mt-12 p-4 bg-gray-100 rounded-lg text-xs text-gray-500 leading-relaxed">
-          <strong>Transparence :</strong> Cet article peut contenir des liens
-          d&apos;affiliation. Si vous achetez via nos liens, nous percevons une
-          commission sans coût supplémentaire pour vous. Nos avis restent
-          indépendants et objectifs.
+        <div className="mt-12 p-4 bg-surface-muted rounded-xl text-xs text-gray-500 leading-relaxed border border-gray-200">
+          <strong className="text-gray-600">Transparence :</strong> Cet article
+          peut contenir des liens d&apos;affiliation. Si vous achetez via nos
+          liens, nous percevons une commission sans coût supplémentaire pour
+          vous. Nos avis restent indépendants et objectifs.
         </div>
       </main>
     </>
